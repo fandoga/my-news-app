@@ -6,7 +6,7 @@ type Props = {
   };
 
 const ArticlesList = ({articles} : Props) => {
-    const grouped = articles.reduce<Record<string, Article[]>>((acc, article) => {
+    const grouped = articles?.reduce<Record<string, Article[]>>((acc, article) => {
         const date = new Date(article.published_date).toLocaleDateString("ru-RU");
         if (!acc[date]) acc[date] = [];
         acc[date].push(article);
