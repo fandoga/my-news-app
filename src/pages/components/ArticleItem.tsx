@@ -21,13 +21,13 @@ const ArticleItem = ({ item }: Props) => {
   }
 
     return (
-        <li key={item.url}>
-              <a className="flex gap-4 items-start py-3" href={item.url} target="_blank" rel="noopener noreferrer">
+        <li key={item?.url}>
+              <a className="flex gap-4 items-start py-3" href={item?.url} target="_blank" rel="noopener noreferrer">
                 <div className="w-26 h-18 flex-shrink-0 mt-9">
-                    {item.multimedia && item.multimedia.length > 0 ? (
+                    {item?.multimedia && item?.multimedia.length > 0 ? (
                       <Image
                         className="w-full h-full object-cover"
-                        src={`https://www.nytimes.com/${item.multimedia[0].url}`}
+                        src={`https://www.nytimes.com/${item?.multimedia[0].url}`}
                         alt={item.title}
                         width={100}
                         height={74}
@@ -40,8 +40,8 @@ const ArticleItem = ({ item }: Props) => {
                 </div>
                 <div className="flex-1">
                     <h3 className="text-base font-semibold text-blue-600 hover:underline line-clamp-2" >{item.source}</h3>
-                    <p className="text-md mt-1 line-clamp-3" >{item.abstract}</p>
-                    <small className="text-gray-400 text-s" >{formatCustomDate(item.published_date)}</small>
+                    <p className="text-md mt-1 line-clamp-3" >{item?.abstract}</p>
+                    <small className="text-gray-400 text-s" >{formatCustomDate(item?.published_date)}</small>
                 </div>
               </a>
             </li>
