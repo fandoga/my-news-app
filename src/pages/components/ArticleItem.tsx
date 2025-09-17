@@ -28,7 +28,7 @@ const ArticleItem = ({ item }: Props) => {
                       <Image
                         className="w-full h-full object-cover"
                         src={`https://www.nytimes.com/${item?.multimedia[0].url}`}
-                        alt={item.title}
+                        alt={item?.title}
                         width={100}
                         height={74}
                       />
@@ -39,7 +39,7 @@ const ArticleItem = ({ item }: Props) => {
                     )}
                 </div>
                 <div className="flex-1">
-                    <h3 className="text-base font-semibold text-blue-600 hover:underline line-clamp-2" >{item.source}</h3>
+                    <h3 className="text-base font-semibold text-blue-600 hover:underline line-clamp-2" >{item?.source}</h3>
                     <p className="text-md mt-1 line-clamp-3" >{item?.abstract}</p>
                     <small className="text-gray-400 text-s" >{formatCustomDate(item?.published_date)}</small>
                 </div>
