@@ -10,6 +10,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log("LOADED FROM CACHE");
     return res.status(200).json(cache);
   }
+
+  console.log("BASE_URL:", process.env.BASE_URL);
+  console.log("API_KEY:", process.env.API_KEY?.slice(0,4) + "****");
   
   try {
     const today = new Date();
