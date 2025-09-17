@@ -11,7 +11,7 @@ const ArtcileBlock = ({articlesGrouped, date}: Props, ) => {
         <section className="mb-5">
             <h2 className="text-lg font-bold pt-2">News for {date}</h2>
             <ul>
-                {articlesGrouped.map((item) => (
+                {(articlesGrouped || []).map((item) => (
                 <ArticleItem
                 key={item.url}
                 item={item}
