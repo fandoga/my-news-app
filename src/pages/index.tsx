@@ -1,115 +1,114 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+import Head from "next/head";
+import React, { useEffect, useRef, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch, wrapper } from "../store/store";
+import { setArticles, loadMore, Article, startLoading, finishLoading} from "../store/newsSlice";
+import { Lato } from "next/font/google";
+import ArticlesList from "./components/ArticlesList";
+import LoaderSpinner from "./components/LoaderSpinner";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import ErrorPage from "./components/ErrorPage";
+
+const lato = Lato({
   subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export default function Home({error} : {error?: number}) {
+  const dispatch = useDispatch<AppDispatch>();
+  const displayedArticles = useSelector(
+    (state: RootState) => state.news.displayedArticles
+  );
 
-export default function Home() {
+  const loaderRef = useRef<HTMLDivElement | null>(null);
+  const loading = useSelector((state: RootState) => state.news.loading)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading) {
+          dispatch(startLoading())
+            setTimeout(() => { // Имитация загрузки при скроле
+              dispatch(loadMore());
+              dispatch(finishLoading())
+            }, 100)
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => {
+      if (loaderRef.current) observer.unobserve(loaderRef.current);
+    };
+  }, [dispatch]);
+
+  // Автообновление
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const res = await fetch(`api/nyt`)
+
+      if (!res.ok) {
+        console.error("Ошибка запроса NYT:", res.status, res.statusText);
+        dispatch(setArticles([]));
+        return { props: {} };
+      }
+      const news: Article[] = await res.json();
+
+      dispatch(setArticles(news));
+      
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+    <>
+      <Head>
+        <title>BESIDER</title>
+        <meta name="description" content="New York Times News" />
+      </Head>
+      <main className={`${lato.className} flex flex-col font-sans max-w-2xl mx-auto min-h-screen p-5`}>
+        <Header/>
+        {error !== 200 ? (
+                <ErrorPage errText={error}/>
+              ) : loading && displayedArticles.length === 0 ? (
+                <LoaderSpinner/>
+              ) : (
+                <ArticlesList articles={displayedArticles}/>
+              )}
+        { loading && (
+          <LoaderSpinner/>
+        )}
+       <Footer ref={loaderRef}/>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    </>
   );
 }
+
+// ------------------- SERVER SIDE -------------------
+
+export const getServerSideProps = wrapper.getServerSideProps(
+  (store) => async ({ req }) => {
+    store.dispatch(startLoading())
+    const baseUrl = process.env.BASE_URL || `http://${req.headers.host}`;
+    const res = await fetch(`${baseUrl}/api/nyt`)
+
+    console.log(res)
+    if (!res.ok) {
+      console.error("Ошибка запроса NYT:", res.status, res.statusText);
+      store.dispatch(setArticles([]));
+      store.dispatch(finishLoading())
+      return { props: {error: res.status} };
+    }
+
+    const news: Article[] = await res.json();
+
+    store.dispatch(setArticles(news));
+    store.dispatch(finishLoading())
+
+    return { props: {error: res.status} };
+  }
+);
