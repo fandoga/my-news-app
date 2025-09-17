@@ -15,7 +15,7 @@ const ArticlesList = ({articles} : Props) => {
 
     return (
         <div>
-            {Object.entries(grouped).map(([date, items]) => (
+            {Object.entries(grouped || {}).map(([date, items]) => (
                 <ArtcileBlock key={date} date={date} articlesGrouped={items}  />
             ))}
         </div>
