@@ -42,7 +42,7 @@ npm run dev
 ```
 
 ## Структура проекта
-
+```bash
 /pages
   /api/nyt.ts       # Прокси для NYT API
   /components       # Компоненты (Header, Footer, ArticlesList и т.д.)
