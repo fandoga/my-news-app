@@ -26,7 +26,7 @@ BESIDER — это новостной агрегатор, вдохновленн
 
 ```bash
 # Клонировать репозиторий
-git clone https://github.com/username/besider-news.git
+git clone https://github.com/fandoga/my-news-app.git
 cd besider-news
 
 # Установить зависимости
